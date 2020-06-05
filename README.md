@@ -47,6 +47,11 @@ python3 wmd.py --dataset YOUR_DATASET.csv --col TEXT_COLOMN_NAME --emb YOUR_WORD
 	- Options : `0` or `1`
 - `--out`	: Output file name
 	- Default : `wmd.csv`
+
+## Our data
+
+* [Tweets of the National Congress of Brazil members, 2019-2020](https://drive.google.com/file/d/1Z1QQAbdtcXX-4j2v3p6BKWmCX1AZ7KuC/view?usp=sharing)
+* [Generated wmd from the file above](https://drive.google.com/file/d/1E5GIS6T4rmr8uwoiIRbqyXqCkLxDw8Ai/view?usp=sharing)
     
 ## References
 
