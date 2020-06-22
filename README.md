@@ -59,6 +59,6 @@ E. Amorim, M. Cançado, and A. Veloso.  2018.  Automated essay scoring in the pr
 
 Caio L. M. Jeronimo, Claudio E. C. Campelo, Leandro Balby Marinho, Allan Sales, Adriano Veloso, and Roberta Viola. 2019. Computing with subjectivity lexicons.*LREC*.
 
-S. Lundberg and S. Lee.  2017.  A unified approach to interpreting model predictions.  In *Annual Conference on Neural Information Processing Systems, Neurips, *pages 4765–4774.
+S. Lundberg and S. Lee.  2017.  A unified approach to interpreting model predictions.  In *Annual Conference on Neural Information Processing Systems, Neurips*, pages 4765–4774.
 
 M. Kusner,  Y. Sun,  N. Kolkin,  and K. Weinberger.   2015.   From word embeddings to document distances.   In *International Conference on Machine Learning, ICML,* pages 957–966.
