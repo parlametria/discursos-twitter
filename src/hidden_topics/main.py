@@ -18,6 +18,7 @@ import numpy as np
 import preprocess
 import tfidf_helper
 import match_helper
+import re
 from gensim.models import KeyedVectors
 import argparse
 
@@ -30,7 +31,10 @@ def vectorizeShortDoc(raw_docs, word_vectors, is_refine=False, word_limit=100):
     print("vectorize short docs...")
     docs = []
     for raw_doc in raw_docs:
-        docs.append(preprocess.tokenizeText(raw_doc))
+        try:
+            docs.append(preprocess.tokenizeText(raw_doc))
+        except:
+            continue
     #print(docs[0:5])
     #docs = preprocess.tokenizeText(raw_docs)
     if (is_refine):
@@ -81,7 +85,10 @@ def mapping(embedding_path, raw_short_docs, raw_long_docs, topic_num=10, \
 
 def extract_texts(input_txt):
     df = pd.read_csv(input_txt)
-    texts = df['text'].tolist()
+    df['clean_tweets'] = [re.sub(r"(?:\@|https?\://)\S+", '', str(x)) for x in df['text']]
+    df['clean_tweets'] = [re.sub("(\\d|\\W)+|\w*\d\w*"," ", str(x)) for x in df['clean_tweets']]
+    df['clean_tweets'] = [re.sub(r"\b[a-zA-Z]\b", "", str(x)) for x in df['clean_tweets']]
+    texts = df['clean_tweets'].tolist()
     return texts
 
 def read_lexicons():
@@ -96,17 +103,24 @@ def read_lexicons():
     return lexicons
 
 
+def read_propositions():
+    path = "./src/data/fake_news.csv"
+    df = pd.read_csv(path)
+    texts = df['completo'].tolist()
+    return texts
+
+
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--embedding_path', type=str, default="../src/data/skip_s300.txt")
-    parser.add_argument('--input_csv', type=str, defaut="../src/data/tweets_parlamentares_clean.csv")
+    parser.add_argument('--embedding_path', type=str, default="./src/data/glove_s300.txt")
+    parser.add_argument('--input_csv', type=str, default="./src/data/classificadas.csv")
     parser.add_argument('--binary_embedding', default=False, action='store_true')
     parser.add_argument('--is_refine_short', default=False, action='store_true')
     parser.add_argument('--is_refine_long', default=False, action='store_true')
     parser.add_argument('--short_word_limit', type=int, default=100)
     parser.add_argument('--long_word_limit', type=int, default=1000)
-    parser.add_argument('--topic_num', type=int, default=10)
-    parser.add_argument('--out', type=str, defaut='output.csv')
+    parser.add_argument('--topic_num', type=int, default=5)
+    parser.add_argument('--out', type=str, default='output.csv')
     args = parser.parse_args()
 
     embedding_path = args.embedding_path
@@ -124,8 +138,10 @@ if __name__=="__main__":
     print("reading data...")
     raw_short_docs = extract_texts(args.input_csv)
     print(len(raw_short_docs))
-    raw_long_docs = read_lexicons()
+    # raw_long_docs = read_lexicons()
+    raw_long_docs = read_propositions()
 
+    
     print("mapping...")
     score_matrix = mapping(embedding_path, raw_short_docs, raw_long_docs, topic_num, \
             is_binary, is_refine_short, is_refine_long, short_word_limit, long_word_limit)
@@ -135,12 +151,11 @@ if __name__=="__main__":
     #     out.write('text,out,vag,arg,mod,val,sent,pres\n')
     #     for i in range(len(raw_short_docs)):
     #         out.write('\"'+raw_short_docs[i]+"\","+str(score_matrix[i][0])+','+str(score_matrix[i][1])+','+str(score_matrix[i][2])+','+str(score_matrix[i][3])+','+str(score_matrix[i][4])+','+str(score_matrix[i][5])+','+str(score_matrix[i][6])+'\n')
-    scm = pd.DataFrame(score_matrix, columns=["Outrage", "Vagueness", "Argumentation", "Modalization", "Valuation", "Sentiment", "Presupposition"])
+    scm = pd.DataFrame(score_matrix, columns=["PL_2630"])
     df = pd.read_csv(args.input_csv)
     df = pd.concat([df, scm], axis=1)
 
-    df.to_csv("ht_tweets_wiki-sg300_2.csv",index=False)
-    
+    df.to_csv("ht_tweets_prop_wiki-glove-s300_fake_news.csv",index=False)
     
     
     
