@@ -30,7 +30,7 @@ def unicode_to_ascii(s):
 def regex_links(s):
     s = re.sub("(Http|Https|http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"," ",s)
     return s
-
+    
 def preprocess_sentence(w):
     w = regex_links(w)
     w = unicode_to_ascii(w.lower().strip())
@@ -339,10 +339,10 @@ df = pd.read_csv(sys.argv[1])
 df.dropna(axis=0, subset=['text'], inplace=True)
 #df['text'] = df.text.apply(clean_text)
 #df[['text']].to_csv('clean_text.csv',index = False)
-df['menciona_RT'] = df.text.str.contains("reforma_tributaria|reforma_administrativa")
+df['menciona_RT'] = df.text.str.contains("reforma_tributaria")
 df_false = df[df.menciona_RT == 0]
 df_true = df[df.menciona_RT == 1]
-df_false = df_false.sample(len(df_true))
+df_false = df_false.sample(20*len(df_true))
 initial_df = pd.concat([df_true,df_false])
 df_list = initial_df.text.to_list()
 corpus = tfidf_filter(df_list, 0.055)
@@ -374,9 +374,9 @@ new_corpus = []
 for doc in corpus:
     new_corpus.append(" ".join(doc))
     for word in doc:
-        #stemmed = stemmer.stem(word)
-        #top_words.append(stemmed)
-        top_words.append(word)
+        stemmed = stemmer.stem(word)
+        top_words.append(stemmed)
+        #top_words.append(word)
 
 initial_df['clean_text'] = new_corpus
 top_words = list(set(top_words))
@@ -392,8 +392,8 @@ def stem_text(line):
     return " ".join(tokens)
 
 
-#initial_df['clean_text'] = initial_df.clean_text.apply(stem_text)
-#initial_df['clean_text'].to_csv("test2.csv",index = False)
+initial_df['clean_text'] = initial_df.clean_text.apply(stem_text)
+initial_df['clean_text'].to_csv("test2.csv",index = False)
 
 # nltk.download('rslp')
 # stemmer = nltk.stem.RSLPStemmer()
@@ -415,7 +415,11 @@ df_matrix.to_csv("df_matrix.csv",index=False)
 
 RANDOM_STATE = 1
 all_features = list(top_words)
-if "class" in all_features: all_features.remove("class")
+if "class" in all_features:
+    print("remove class")
+    all_features.remove("class")
+
+if "class" in all_features:all_features.remove("reforma_tribut")
 #print(all_features)
 
 md = 1
