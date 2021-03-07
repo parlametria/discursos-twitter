@@ -163,7 +163,8 @@ rep = {
     " o povo ":" o_povo ",
     " meio ambiente ":" meio_ambiente ",
     " reforma tributaria ":" reforma_tributaria ",
-    " reforma administrativa ":" reforma_administrativa "
+    " reforma administrativa ":" reforma_administrativa ",
+    " reforma da previdencia ":" reforma_da_previdencia "
 }
 
 rep = dict((re.escape(k), v) for k, v in rep.items()) 
@@ -332,17 +333,17 @@ def expand_dataset(original_df, df_atual ,new_feature,vocab):
     return new_df_matrix, new_df
 
 
-
+ 
 
 # Reads dataset
-df = pd.read_csv(sys.argv[1])
+df = pd.read_csv(sys.argv[1],lineterminator='\n')
 df.dropna(axis=0, subset=['text'], inplace=True)
-#df['text'] = df.text.apply(clean_text)
-#df[['text']].to_csv('clean_text.csv',index = False)
-df['menciona_RT'] = df.text.str.contains("reforma_tributaria")
+df['text'] = df.text.apply(clean_text)
+df[['text']].to_csv('clean_text_2021.csv',index = False)
+df['menciona_RT'] = df.text.str.match("^(?=.*(reforma_administrativa))(?:(?!(previdencia|reforma_tributaria|reforma_da_previdencia)).)+$")
 df_false = df[df.menciona_RT == 0]
 df_true = df[df.menciona_RT == 1]
-df_false = df_false.sample(20*len(df_true))
+df_false = df_false.sample(len(df_true))
 initial_df = pd.concat([df_true,df_false])
 df_list = initial_df.text.to_list()
 corpus = tfidf_filter(df_list, 0.055)
@@ -454,7 +455,7 @@ for feature1 in all_features:
             x = feature2
             k = z
     ranking = dict(zip(words, aucs))
-    all_features = sorted(ranking, key=ranking.get, reverse=True)[0:1000]
+    all_features = sorted(ranking, key=ranking.get, reverse=True)[0:300]
     f.insert(len(f), x)
     #if x != "reforma_tributaria":
     #    df_matrix,initial_df = expand_dataset(df, initial_df ,x,all_features)
@@ -463,3 +464,4 @@ for feature1 in all_features:
         while v == 1:
             v,f = back_one(df_matrix, f, md)
         i = len(f)
+        
