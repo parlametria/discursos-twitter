@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 
+print("preparing data...")
 df = pd.read_csv("../../../data/ht_arm_rac_2019-01-01_to_2021-02-22.csv",lineterminator='\n')#[["nome_eleitoral","partido","created_at","text","ambiental","rt_auto","ra_auto","rp_auto"]]
 lexicons = ['Outrage','Vagueness', 'Argumentation', 'Modalization', 'Valuation', 'Sentiment',
        'Presupposition', 'Ambiental', 'rt_auto', 'ra_auto', 'rp_auto',
@@ -35,17 +36,22 @@ for _, row in df.iterrows():
         temas.append(6)
 df["tema"] = temas
 
-
+print("generating tsne...")
 tsne = TSNE(n_components=2, random_state=0,learning_rate = 350)
 X = df[features].values
 y = df[["tema"]].values
 
 X_2d = tsne.fit_transform(X)
 
-X_2d = X_2d.values
+
+print("saving tsne...")
+X_2df = pd.DataFrame(X_2d)
+X_2df.to_csv("tsne_parl_inf.csv",index=False)
 
 target_ids = range(len(features)+1)
 
+
+print("plotting general tsne")
 fig = plt.figure(figsize=(40, 40))
 
 colors =  'grey','g', 'b', 'c', 'm', 'red', 'black'
@@ -56,6 +62,3 @@ for i, c, label in zip(target_ids, colors, ["none",'Ambiental','Reforma Tributá
 plt.legend(markerscale=7,fontsize=30)
 #plt.show()
 fig.savefig("tsne_temas.png")
-
-X_2df = pd.DataFrame(X_2d)
-X_2df.to_csv("tsne_parl_inf.csv",index=False)
