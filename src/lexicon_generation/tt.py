@@ -18,11 +18,29 @@ from sklearn.feature_extraction.text import CountVectorizer
 from gensim.corpora import Dictionary
 from gensim.models import TfidfModel
 
+import argparse
+
 import unicodedata
 import re
 import os
 import io
 import time
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--dataset", type=str, help='starting date for the collection')
+parser.add_argument("--positives", type=str, help='comma separated words')
+parser.add_argument("--negatives", type=str, help='comma separated words')
+
+args = parser.parse_args()
+input_dataset = args.dataset
+positives = args.positives
+negatives = args.negatives
+
+positives = positives.split(',')
+positives = "|".join(positives)
+
+negatives = negatives.split(',')
+negatives = "|".join(negatives)
 
 def unicode_to_ascii(s):
     return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
@@ -336,11 +354,11 @@ def expand_dataset(original_df, df_atual ,new_feature,vocab):
  
 
 # Reads dataset
-df = pd.read_csv(sys.argv[1],lineterminator='\n')
+df = pd.read_csv(input_dataset,lineterminator='\n')
 df.dropna(axis=0, subset=['text'], inplace=True)
 df['text'] = df.text.apply(clean_text)
-df[['text']].to_csv('clean_text_2021.csv',index = False)
-df['menciona_RT'] = df.text.str.match("^(?=.*(reforma_administrativa))(?:(?!(previdencia|reforma_tributaria|reforma_da_previdencia)).)+$")
+#df[['text']].to_csv('clean_text_2021.csv',index = False)
+df['menciona_RT'] = df.text.str.match("^(?=.*("+positives+"))(?:(?!("+negatives+")).)+$")
 df_false = df[df.menciona_RT == 0]
 df_true = df[df.menciona_RT == 1]
 df_false = df_false.sample(len(df_true))
@@ -402,7 +420,7 @@ initial_df['clean_text'].to_csv("test2.csv",index = False)
 # print(a)
 #print(len(top_words))
 
-matrix = CountVectorizer(vocabulary=top_words)
+matrix = CountVectorizer(vocabulary=top_words,max_features=50000,dtype=np.int16)
 X = matrix.fit_transform(initial_df.clean_text).toarray()
 classes = initial_df['menciona_RT'].astype(int).to_list()
 #print(len(classes))
