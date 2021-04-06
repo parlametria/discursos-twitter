@@ -42,6 +42,7 @@ positives = "|".join(positives)
 negatives = negatives.split(',')
 negatives = "|".join(negatives)
 
+print("parse args")
 def unicode_to_ascii(s):
     return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
 
@@ -332,7 +333,7 @@ def expand_dataset(original_df, df_atual ,new_feature,vocab):
     print("new_feature=",new_feature)
     df['menciona_RT'] = original_df.text.str.contains(new_feature)
     df_false = df[df.menciona_RT == 0]
-    df_true = df[df.menciona_RT == 1]
+    df_true = df[df.menciona_RT == 1].sample(22000)
     df_false = df_false.sample(len(df_true))
     new_df = pd.concat([df_atual,df_true,df_false])
     df_list = new_df.text.to_list()
@@ -354,13 +355,15 @@ def expand_dataset(original_df, df_atual ,new_feature,vocab):
  
 
 # Reads dataset
+print('reading dataset')
 df = pd.read_csv(input_dataset,lineterminator='\n')
+df = df[df.partido != "INFLUENCER"]
 df.dropna(axis=0, subset=['text'], inplace=True)
 df['text'] = df.text.apply(clean_text)
 #df[['text']].to_csv('clean_text_2021.csv',index = False)
 df['menciona_RT'] = df.text.str.match("^(?=.*("+positives+"))(?:(?!("+negatives+")).)+$")
 df_false = df[df.menciona_RT == 0]
-df_true = df[df.menciona_RT == 1]
+df_true = df[df.menciona_RT == 1].sample(10000)
 df_false = df_false.sample(len(df_true))
 initial_df = pd.concat([df_true,df_false])
 df_list = initial_df.text.to_list()
@@ -387,7 +390,7 @@ corpus = tfidf_filter(df_list, 0.055)
 
 nltk.download('rslp')
 stemmer = nltk.stem.RSLPStemmer()
-
+print("stemming")
 top_words = []
 new_corpus = []
 for doc in corpus:
@@ -419,8 +422,8 @@ initial_df['clean_text'].to_csv("test2.csv",index = False)
 # a = stemmer.stem("presidente")
 # print(a)
 #print(len(top_words))
-
-matrix = CountVectorizer(vocabulary=top_words,max_features=50000,dtype=np.int16)
+print("building wc-matrix")
+matrix = CountVectorizer(vocabulary=top_words,max_features=9000,dtype=np.int16)
 X = matrix.fit_transform(initial_df.clean_text).toarray()
 classes = initial_df['menciona_RT'].astype(int).to_list()
 #print(len(classes))
@@ -451,6 +454,7 @@ aucs = []
 words = []
 # print(df_matrix)
 #print(all_features)
+print("start algorithm")
 for feature1 in all_features:
     if i == 20: break
     if feature1 in f: continue
