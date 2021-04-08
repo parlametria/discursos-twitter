@@ -3,9 +3,9 @@
 ## Linha do tempo dos Léxicos
 
   * Outrage(./Outrage.html)
-  * Argumentação(./Argumentation.html )
+  * Argumentação(./Argumentation.html)
   * Vagueza(./Vagueness.html)
-  * Sentimento(Sentiment.html )
+  * Sentimento(Sentiment.html)
   
 ## Léxicos do Parlamentar
 
