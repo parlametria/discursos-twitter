@@ -260,8 +260,9 @@ def read_lexicons():
     armas = 'arma posse decreto morte projeto acesso violencia seguranca tiro importacao rural cidadao policia crime suzano registro municao liberacao'
     racismo = 'negro quilombola luta crime estrutura combate violencia racista vidasnegrasimportam consultaquilombolaja raca antirracista preconceito existe ostracismo protesto'
     covid = 'covid corona coronavirus combate mortes contra enfrentamento covid19 crise casos testagem vacina vidas medicos virus emergencial paciente isolamento'
+    imp = 'impeachment impeachmant pedido forabolsonaro democracia renunciamoro governo impeachmentja renuncia processo golpe crime ditadura todospeloimpeachment renuncia tentativa impeachmentbolsonarourgente impeachmentdebolsonaro militar'
 
-    lexicons = [outrage, vagueza, argumentacao,modalizacao, valoracao, sentimento, pressuposicao, ambiental3, rt_auto2, ra2, rp, armas, racismo, covid]
+    lexicons = [outrage, vagueza, argumentacao,modalizacao, valoracao, sentimento, pressuposicao, ambiental3, rt_auto2, ra2, rp, armas, racismo, covid, imp]
     #lexicons = [ambiental3,rt_auto2, ra2, rp]
     return lexicons
 
@@ -308,7 +309,7 @@ if __name__=="__main__":
     #     out.write('text,out,vag,arg,mod,val,sent,pres\n')
     #     for i in range(len(raw_short_docs)):
     #         out.write('\"'+raw_short_docs[i]+"\","+str(score_matrix[i][0])+','+str(score_matrix[i][1])+','+str(score_matrix[i][2])+','+str(score_matrix[i][3])+','+str(score_matrix[i][4])+','+str(score_matrix[i][5])+','+str(score_matrix[i][6])+'\n')
-    scm = pd.DataFrame(score_matrix, columns=["Outrage", "Vagueness", "Argumentation", "Modalization", "Valuation", "Sentiment", "Presupposition",'Ambiental',"rt_auto",'ra_auto','rp_auto','armas_auto','racismo_auto','covid_auto'])
+    scm = pd.DataFrame(score_matrix, columns=["Outrage", "Vagueness", "Argumentation", "Modalization", "Valuation", "Sentiment", "Presupposition",'Ambiental',"rt_auto",'ra_auto','rp_auto','armas_auto','racismo_auto','covid_auto','impeachment_auto'])
     #scm = pd.DataFrame(score_matrix, columns=["ambiental","rt_auto","ra_auto",'rp_auto'])
     df = pd.concat([df, scm], axis=1)
 
